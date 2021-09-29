@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {dbService} from 'fbase';
 
-const Home = ({firestore}) => {
+const Home = ({firestore, userObj}) => {
 	const [content, setContent] = useState("");
 	const [kweets, setKweets] = useState([]);
 
@@ -10,19 +10,14 @@ const Home = ({firestore}) => {
 		setContent(value);
 	};
 
-	const getKweets = async () => {
-		const dbKweets = await dbService.getDocs(dbService.collection(firestore, "kweet"));
-		dbKweets.forEach((doc) => {
-			const newDoc = {
-				...doc.data(),
-				id: doc.id,
-			}
-			setKweets((prev) => [newDoc, ...prev])
-		});
-	}
-
 	useEffect(() => {
-		getKweets();
+		dbService.onSnapshot(dbService.collection(firestore, "kweet"), (snapshot) => {
+			const kweetObj = snapshot.docs.map((doc) => ({
+				...doc.data(),
+				id: doc.id
+			}))
+			setKweets(kweetObj);
+		});
 	}, []);
 
 	const onSubmit = async (event) => {
@@ -30,6 +25,7 @@ const Home = ({firestore}) => {
 		await dbService.addDoc(dbService.collection(firestore, "kweet"), {
 			content,
 			createdAt: dbService.serverTimestamp(),
+			createrId: userObj.uid,
 		})
 		setContent("");
 	} 

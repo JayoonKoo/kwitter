@@ -7,11 +7,13 @@ function App() {
   const firestore = dbService.getFirestore();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userObj, setUserObj] = useState(null);
 
   useEffect(() => {
     authService.onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
+        setUserObj(user);
       } else {
         setIsLoggedIn(false);
       }
@@ -23,7 +25,12 @@ function App() {
       {isLoading ? (
         "Loading..."
       ) : (
-        <AppRouter isLoggedIn={isLoggedIn} auth={auth} firestore={firestore} />
+        <AppRouter
+          isLoggedIn={isLoggedIn}
+          auth={auth}
+          firestore={firestore}
+          userObj={userObj}
+        />
       )}
     </>
   );

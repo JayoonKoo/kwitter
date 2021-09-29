@@ -4,7 +4,7 @@ import Home from "routes/Home";
 import Navigation from 'components/Navigation';
 import Profile from "routes/Profile";
 
-const AppRouter = ({ isLoggedIn , auth, firestore }) => {
+const AppRouter = ({ isLoggedIn , auth, firestore, userObj }) => {
   return (
     <Router>
 			{isLoggedIn ? <Navigation /> : null}
@@ -12,7 +12,7 @@ const AppRouter = ({ isLoggedIn , auth, firestore }) => {
         {isLoggedIn ? (
           <>
             <Route exact path="/">
-              <Home firestore={firestore}/>
+              <Home firestore={firestore} userObj={userObj}/>
             </Route>
             <Route exact path="/profile">
               <Profile auth={auth}/>
