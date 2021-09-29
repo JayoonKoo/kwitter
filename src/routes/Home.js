@@ -5,6 +5,7 @@ import Kweet from "components/Kweet";
 const Home = ({ firestore, userObj }) => {
   const [content, setContent] = useState("");
   const [kweets, setKweets] = useState([]);
+	const [imgUrl, setImgUrl] = useState("");
 
   const onChange = (event) => {
     const {
@@ -36,6 +37,20 @@ const Home = ({ firestore, userObj }) => {
     setContent("");
   };
 
+	const onImageInputChange = (event) => {
+		const {target: {files}} = event;
+		const file = files[0];
+		let reader = new FileReader();
+
+		reader.addEventListener("load", (event) => {
+			console.log(event);
+		})
+
+		if (file) {
+			reader.readAsDataURL(file);
+		}
+	}
+
   return (
     <>
       <form onSubmit={onSubmit}>
@@ -45,10 +60,11 @@ const Home = ({ firestore, userObj }) => {
           onChange={onChange}
           placeholder="트윗을 적어 주세요."
           maxLength={120}
+					required
         />
+				<input type="file" accept="image/*" onChange={onImageInputChange}/>
         <input type="submit" value="tweet" />
       </form>
-
       <ul>
         {kweets.map((kweet) => (
           <Kweet
