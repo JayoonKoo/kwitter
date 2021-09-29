@@ -1,11 +1,10 @@
-import React, { useState } from "react";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import Auth from "routes/Auth";
 import Home from "routes/Home";
 import Navigation from 'components/Navigation';
 import Profile from "routes/Profile";
 
-const AppRouter = ({ isLoggedIn , auth }) => {
+const AppRouter = ({ isLoggedIn , auth, firestore }) => {
   return (
     <Router>
 			{isLoggedIn ? <Navigation /> : null}
@@ -13,7 +12,7 @@ const AppRouter = ({ isLoggedIn , auth }) => {
         {isLoggedIn ? (
           <>
             <Route exact path="/">
-              <Home />
+              <Home firestore={firestore}/>
             </Route>
             <Route exact path="/profile">
               <Profile auth={auth}/>
