@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { dbService } from "fbase";
+import { dbService, storageService, storage } from "fbase";
+import { v4 as uuidv4 } from 'uuid';
 import Kweet from "components/Kweet";
 
 const Home = ({ firestore, userObj }) => {
   const [content, setContent] = useState("");
   const [kweets, setKweets] = useState([]);
-	const [imgUrl, setImgUrl] = useState("");
+	const [attachment, setAttachment] = useState();
+	const {ref, uploadString, getDownloadURL} = storageService;
 
   const onChange = (event) => {
     const {
@@ -29,12 +31,19 @@ const Home = ({ firestore, userObj }) => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    await dbService.addDoc(dbService.collection(firestore, "kweet"), {
+		const attachmentRef = ref(storage, `${userObj.uid}/${uuidv4()}`)
+		const response = await uploadString(attachmentRef, attachment, 'data_url')
+		const attachmentURL = await getDownloadURL(attachmentRef);
+		console.log(attachmentURL);
+		const kweet = {
+			attachmentURL,
       content,
       createdAt: dbService.serverTimestamp(),
       createrId: userObj.uid,
-    });
+		}
+    await dbService.addDoc(dbService.collection(firestore, "kweet"), kweet);
     setContent("");
+		setAttachment(null);
   };
 
 	const onImageInputChange = (event) => {
@@ -43,13 +52,16 @@ const Home = ({ firestore, userObj }) => {
 		let reader = new FileReader();
 
 		reader.addEventListener("load", (event) => {
-			console.log(event);
+			const {target: {result}} = event;
+			setAttachment(result);
 		})
 
 		if (file) {
 			reader.readAsDataURL(file);
 		}
 	}
+
+	const onClearAttachment = () => setAttachment(null);
 
   return (
     <>
@@ -64,6 +76,11 @@ const Home = ({ firestore, userObj }) => {
         />
 				<input type="file" accept="image/*" onChange={onImageInputChange}/>
         <input type="submit" value="tweet" />
+				{attachment && 
+					<div>
+						<img src={attachment} width="50px" alt="profile"/>
+						<button onClick={onClearAttachment}>Clear</button>
+					</div>}
       </form>
       <ul>
         {kweets.map((kweet) => (

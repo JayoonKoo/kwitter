@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import * as auth from "firebase/auth";
 import * as database from "firebase/firestore";
+import {getStorage, ref, uploadString, getDownloadURL} from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -11,6 +12,8 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_APP_ID,
 };
 
-initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 export const dbService = database;
+export const storage = getStorage(firebaseApp);
+export const storageService = {ref, uploadString, getDownloadURL};
 export const authService = auth;
