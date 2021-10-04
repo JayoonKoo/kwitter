@@ -1,14 +1,17 @@
-import { dbService } from "fbase";
+import { dbService, storageService, storage } from "fbase";
 import { useState } from "react";
 
-const Kweet = ({ kweet, isOwner, firestore }) => {
+const Kweet = ({ attachmentURL, kweet, isOwner, firestore}) => {
   const [editing, setEditing] = useState(false);
   const [updateKweet, setUpdateKweet] = useState(kweet.content);
+	const {ref, deleteObject} = storageService;
+
+
+
   const onDeleteClick = async () => {
     if (window.confirm("삭제하시겠습니까?")) {
-      await dbService.deleteDoc(
-        dbService.doc(firestore, "kweet", `${kweet.id}`)
-      );
+      await dbService.deleteDoc( dbService.doc(firestore, "kweet", `${kweet.id}`));
+			await deleteObject(ref(storage, attachmentURL));
     }
   };
 
@@ -51,13 +54,14 @@ const Kweet = ({ kweet, isOwner, firestore }) => {
         <>
           <li>
             <h4>{updateKweet}</h4>
+						{attachmentURL && <img src={attachmentURL} width="100" alt="kweet이미지"/>}
+						{isOwner ? (
+							<div>
+								<button onClick={onDeleteClick}>삭제하기</button>
+								<button onClick={updateClick}>수정하기</button>
+							</div>
+						) : null}
           </li>
-          {isOwner ? (
-            <div>
-              <button onClick={onDeleteClick}>삭제하기</button>
-              <button onClick={updateClick}>수정하기</button>
-            </div>
-          ) : null}
         </>
       )}
     </>

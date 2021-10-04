@@ -15,7 +15,7 @@ const AppRouter = ({ isLoggedIn , auth, firestore, userObj }) => {
               <Home firestore={firestore} userObj={userObj}/>
             </Route>
             <Route exact path="/profile">
-              <Profile auth={auth}/>
+              <Profile firestore={firestore} auth={auth} userObj={userObj}/>
             </Route>
           </>
         ) : (
